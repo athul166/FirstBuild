@@ -4,10 +4,9 @@ import Paper from 'material-ui/Paper';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
-import Cards from './cards.js'
-import ViewLanguagePack from './ViewLanguagePack.js'
+import Cards from './cards.js';
 import SearchLibrary from './SearchLibrary.js'
-import CardComponent from './CardComponent.js'
+import NewComponent from './newComponent.js'
 
 class App extends Component {
   constructor(props) {
@@ -38,8 +37,6 @@ class App extends Component {
             </Drawer>
         </Paper>
         <SearchLibrary />
-        <CardComponent />
-
       </div>
       </MuiThemeProvider>
     );

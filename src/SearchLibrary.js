@@ -4,7 +4,8 @@ import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import axios from 'axios';
-import CardComponent from './CardComponent.js'
+import NewComponent from './newComponent.js'
+
 
 const style = {
   width: '80%',
@@ -14,13 +15,11 @@ const style = {
 };
 
 const chipStyl = {
+
   chip: {
     margin: 4,
-  },
-  wrapper: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
+    }
+
 };
 
 const iconStyles = {
@@ -31,7 +30,29 @@ const iconStyles = {
 class SearchLibrary extends Component {
   constructor(props) {
     super(props);
-    this.state = {open: false,value:'',chipContent:[],arr_div:[]};
+    this.state = {
+      open: false,
+      value:'',
+      chipContent:[],
+      arr_div:[],
+      new_arr:[]
+    };
+  }
+  componentDidMount(){
+    var _this = this;
+    this.serverRequest =
+      axios
+        .get("http://localhost:4000/db")
+        .then(function(result) {
+          //console.log(result.data.Workflows);
+          _this.setState({
+            arr_div: result.data.Workflows
+          });
+        })
+  }
+
+  componentWillUnmount(){
+    this.serverRequest.abort();
   }
 
   handleRequestDelete(i) {
@@ -47,51 +68,45 @@ class SearchLibrary extends Component {
 
    onClickGo(event)
   {
+    alert("dsfadsf");
     var input=this.state.value;
-    /////////////////////////////
     var that=this;
-        var count=0;
-        axios.get("http://localhost:4000/Workflows")
-          .then(function(result){
-        //  console.log(result.data);
-          //console.log("the value of textbox  "+ that.state.value);
-          var arr=result.data;
-          // console.log("arrrr ");
-          // console.log(arr);
-          arr.map((a,e)=>{
-            // console.log("value of a "+a.tags+"   e "+e);
-            var tags_arr=a.tags;
-            tags_arr.map((t,i)=>{
-              // console.log("value of t "+t+"   i "+i+"   and textbox "+that.state.value);
-              if(t.toLowerCase()===input.toLowerCase())
-              {
-                console.log(a);
-                that.setState({arr_div:a})
-              //  console.log("Now state is "+that.state.arr_div.tags);
-                count++;
-              }
+      var count=0;
+    /////////////////////////////
+    console.log(this.state.arr_div);
+    this.state.arr_div.map((a,e)=>{
+      var tags_arr=a.tags;
+      tags_arr.map((t,i)=>{
+        // console.log("value of t "+t+"   i "+i+"   and textbox "+that.state.value);
+        if(t.toLowerCase()===input.toLowerCase())
+        {
+          console.log(a);
+          var newarr=this.state.new_arr;
+          newarr.push(a);
+          that.setState({arr_div:newarr});
+        //  console.log("Now state is "+that.state.arr_div.tags);
+          count++;
+        }
 
-            })
-          })
-          if(count==0)
-          {
-            alert("Sorry no workflow found");
-          }
-          else {
-            var c=0;
-            var arr=that.state.chipContent;
-            arr.map((d,m)=>{
-              if(d===input)
-              {
-                c++;
-              }
-            })
-            if(c==0)
-            arr.push(input);
-            that.setState({chipContent:arr});
-          }
-          });
-    //////////////////
+    });
+  });
+    if(count==0)
+    {
+      alert("Sorry no workflow found");
+    }
+    else {
+      var c=0;
+      var arr=that.state.chipContent;
+      arr.map((d,m)=>{
+        if(d===input)
+        {
+          c++;
+        }
+      });
+      if(c==0)
+      arr.push(input);
+      that.setState({chipContent:arr});
+    }
     this.setState({value:''});
   }
 
@@ -106,19 +121,21 @@ class SearchLibrary extends Component {
         <Chip  key={i}
           onRequestDelete={this.handleRequestDelete.bind(this,i)}
           onTouchTap={this.handleTouchTap.bind(this)}
-          style={chipStyl.chip}
+          style={chipStyl}
         >
           {item}
       </Chip>
       );
     })
+    console.log(this.state.arr_div);
   return (
     <div style={style}>
           <TextField
                 hintText="Search here" value={this.state.value}
                 floatingLabelText="Floating Label Text"  onChange={this.handleChange.bind(this)}/>
           <RaisedButton label="Go" primary={true} onClick={this.onClickGo.bind(this)} style={{'marginLeft':'5'}}/>
-          <div style={{'width':'40%','margin':'auto'}}>{items}</div>
+          <div style={{'width':'40%','margin':'auto','display':'-webkit-box'}}>{items}</div>
+          <NewComponent pageData={this.state.arr_div} />
     </div>
     );
   }
